@@ -8,15 +8,24 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
+    <Filter Include="Video">
+      <UniqueIdentifier>{47f01226-0f46-4eb1-b762-4b50d875a1b2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="InputWidgets\MCSlider.cpp">
       <Filter>InputWidgets</Filter>
     </ClCompile>
+    <ClCompile Include="Video\MCVideoPlayer.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="InputWidgets\MCSlider.h">
       <Filter>InputWidgets</Filter>
+    </QtMoc>
+    <QtMoc Include="Video\MCVideoPlayer.h">
+      <Filter>Video</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

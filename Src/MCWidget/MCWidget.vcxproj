@@ -12,10 +12,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Global\MCWidget_Global.h" />
+    <QtMoc Include="Video\MCVideoPlayer.h" />
     <QtMoc Include="InputWidgets\MCSlider.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="InputWidgets\MCSlider.cpp" />
+    <ClCompile Include="Video\MCVideoPlayer.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{B3B3F3F5-BE56-49C2-9E0C-AD86D3F86BBA}</ProjectGuid>
@@ -62,17 +64,22 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>Global;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Global;$(SolutionDir)Module\FFmpeg\FFmpeg-6.1.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <PostBuildEvent>
-      <Command>if not exist "$(SolutionDir)Include\$(ProjectName)\Global" mkdir "$(SolutionDir)Include\$(ProjectName)\Global"
-copy "$(ProjectDir)Global\*.h" "$(SolutionDir)Include\$(ProjectName)\Global\*.h"
+      <Command>if not exist "$(SolutionDir)Include\$(ProjectName)" mkdir "$(SolutionDir)Include\$(ProjectName)"
+copy "$(ProjectDir)Global\*.h" "$(SolutionDir)Include\$(ProjectName)\*.h"
+copy "$(ProjectDir)InputWidgets\*.h" "$(SolutionDir)Include\$(ProjectName)\*.h"
+copy "$(ProjectDir)Video\*.h" "$(SolutionDir)Include\$(ProjectName)\*.h"
 
 if not exist "$(SolutionDir)Lib\$(ProjectName)" mkdir "$(SolutionDir)Lib\$(ProjectName)"
 copy "$(SolutionDir)Bin\$(ProjectName)\*.lib" "$(SolutionDir)Lib\$(ProjectName)\*.lib"
 
 </Command>
     </PostBuildEvent>
+    <Link>
+      <AdditionalDependencies>$(SolutionDir)Module\FFmpeg\FFmpeg-6.1.1\lib\avcodec.lib;$(SolutionDir)Module\FFmpeg\FFmpeg-6.1.1\lib\avdevice.lib;$(SolutionDir)Module\FFmpeg\FFmpeg-6.1.1\lib\avfilter.lib;$(SolutionDir)Module\FFmpeg\FFmpeg-6.1.1\lib\avformat.lib;$(SolutionDir)Module\FFmpeg\FFmpeg-6.1.1\lib\avutil.lib;$(SolutionDir)Module\FFmpeg\FFmpeg-6.1.1\lib\swresample.lib;$(SolutionDir)Module\FFmpeg\FFmpeg-6.1.1\lib\swscale.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
