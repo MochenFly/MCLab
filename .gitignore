@@ -400,3 +400,5 @@ FodyWeavers.xsd
 # Added by MC
 Bin
 Temp
+Include
+Lib

@@ -10,8 +10,17 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Global\MCWidget_Global.h" />
+    <QtMoc Include="Video\MCVideoPlayer.h" />
+    <QtMoc Include="InputWidgets\MCSlider.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="InputWidgets\MCSlider.cpp" />
+    <ClCompile Include="Video\MCVideoPlayer.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{56CB9DE5-6FF9-4B1F-A8AB-CEABD2B21889}</ProjectGuid>
+    <ProjectGuid>{B3B3F3F5-BE56-49C2-9E0C-AD86D3F86BBA}</ProjectGuid>
     <Keyword>QtVS_v304</Keyword>
     <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">10.0.17763.0</WindowsTargetPlatformVersion>
     <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">10.0.17763.0</WindowsTargetPlatformVersion>
@@ -19,11 +28,11 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -55,7 +64,26 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Global;$(SolutionDir)Module\FFmpeg\FFmpeg-6.1.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <PostBuildEvent>
+      <Command>if not exist "$(SolutionDir)Include\$(ProjectName)" mkdir "$(SolutionDir)Include\$(ProjectName)"
+copy "$(ProjectDir)Global\*.h" "$(SolutionDir)Include\$(ProjectName)\*.h"
+copy "$(ProjectDir)InputWidgets\*.h" "$(SolutionDir)Include\$(ProjectName)\*.h"
+copy "$(ProjectDir)Video\*.h" "$(SolutionDir)Include\$(ProjectName)\*.h"
+
+if not exist "$(SolutionDir)Lib\$(ProjectName)" mkdir "$(SolutionDir)Lib\$(ProjectName)"
+copy "$(SolutionDir)Bin\$(ProjectName)\*.lib" "$(SolutionDir)Lib\$(ProjectName)\*.lib"
+
+</Command>
+    </PostBuildEvent>
+    <Link>
+      <AdditionalDependencies>$(SolutionDir)Module\FFmpeg\FFmpeg-6.1.1\lib\avcodec.lib;$(SolutionDir)Module\FFmpeg\FFmpeg-6.1.1\lib\avdevice.lib;$(SolutionDir)Module\FFmpeg\FFmpeg-6.1.1\lib\avfilter.lib;$(SolutionDir)Module\FFmpeg\FFmpeg-6.1.1\lib\avformat.lib;$(SolutionDir)Module\FFmpeg\FFmpeg-6.1.1\lib\avutil.lib;$(SolutionDir)Module\FFmpeg\FFmpeg-6.1.1\lib\swresample.lib;$(SolutionDir)Module\FFmpeg\FFmpeg-6.1.1\lib\swscale.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>Global;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
@@ -73,6 +101,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>MCWIDGET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -83,21 +112,15 @@
     <ClCompile>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <DebugInformationFormat>None</DebugInformationFormat>
-      <Optimization>MaxSpeed</Optimization>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>MCWIDGET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <QtRcc Include="MCVideoPlayer.qrc" />
-    <QtUic Include="MCVideoPlayer.ui" />
-    <QtMoc Include="MCVideoPlayer.h" />
-    <ClCompile Include="MCVideoPlayer.cpp" />
-    <ClCompile Include="main.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
     <Import Project="$(QtMsBuild)\qt.targets" />

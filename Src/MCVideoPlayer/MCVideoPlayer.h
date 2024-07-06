@@ -1,7 +1,6 @@
 #pragma once
 
 #include <QtWidgets/QMainWindow>
-#include "ui_MCVideoPlayer.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MCVideoPlayerClass; };
@@ -12,9 +11,9 @@ class MCVideoPlayer : public QMainWindow
     Q_OBJECT
 
 public:
-    MCVideoPlayer(QWidget *parent = nullptr);
+    MCVideoPlayer(QWidget* parent = nullptr);
     ~MCVideoPlayer();
 
 private:
-    Ui::MCVideoPlayerClass *ui;
+    Ui::MCVideoPlayerClass* ui;
 };
