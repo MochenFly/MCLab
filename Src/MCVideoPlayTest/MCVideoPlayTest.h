@@ -2,6 +2,8 @@
 
 #include <QtWidgets/QMainWindow>
 
+#include "MCWidget/MCVideoPlayer.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MCVideoPlayTest; };
 QT_END_NAMESPACE
@@ -15,5 +17,7 @@ public:
     ~MCVideoPlayTest();
 
 private:
-    Ui::MCVideoPlayTest* ui;
+    Ui::MCVideoPlayTest*        ui;
+
+    MCWidget::MCVideoPlayer*    m_pVideoPlayer      { nullptr };
 };
