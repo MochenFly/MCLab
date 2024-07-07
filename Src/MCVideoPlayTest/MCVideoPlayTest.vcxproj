@@ -16,6 +16,7 @@
     <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">10.0.17763.0</WindowsTargetPlatformVersion>
     <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">10.0.17763.0</WindowsTargetPlatformVersion>
     <QtMsBuild Condition="'$(QtMsBuild)'=='' OR !Exists('$(QtMsBuild)\qt.targets')">$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
+    <ProjectName>MCVideoPlayTest</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
@@ -50,13 +51,23 @@
     <IntDir>$(SolutionDir)Temp\$(ProjectName)</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <OutDir>$(SolutionDir)Bin\$(ProjectName)</OutDir>
-    <IntDir>$(SolutionDir)Temp\$(ProjectName)</IntDir>
+    <OutDir>$(SolutionDir)Bin\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)Temp\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Include;$(SolutionDir)Module\FFmpeg\FFmpeg-6.1.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <Link>
+      <AdditionalDependencies>$(SolutionDir)Lib\MCWidget\MCWidget.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy "$(SolutionDir)Bin\MCWidget\MCWidget.dll" "$(OutDir)MCWidget.dll"
+copy "$(SolutionDir)Bin\MCWidget\MCWidget.pdb" "$(OutDir)MCWidget.pdb"
+
+copy "$(SolutionDir)Module\FFmpeg\FFmpeg-6.1.1\bin\*.dll" "$(OutDir)*.dll"
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -83,19 +94,18 @@
     <ClCompile>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <DebugInformationFormat>None</DebugInformationFormat>
-      <Optimization>MaxSpeed</Optimization>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <QtRcc Include="MCVideoPlayer.qrc" />
-    <QtUic Include="MCVideoPlayer.ui" />
-    <QtMoc Include="MCVideoPlayer.h" />
-    <ClCompile Include="MCVideoPlayer.cpp" />
+    <QtUic Include="MCVideoPlayTest.ui" />
+    <QtMoc Include="MCVideoPlayTest.h" />
+    <ClCompile Include="MCVideoPlayTest.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

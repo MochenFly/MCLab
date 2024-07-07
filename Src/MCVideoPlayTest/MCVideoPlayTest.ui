@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MCVideoPlayerClass</class>
- <widget class="QMainWindow" name="MCVideoPlayerClass">
+ <class>MCVideoPlayTest</class>
+ <widget class="QMainWindow" name="MCVideoPlayTest">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -76,8 +76,5 @@
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources>
-  <include location="MCVideoPlayer.qrc"/>
- </resources>
  <connections/>
 </ui>

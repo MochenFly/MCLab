@@ -1,10 +1,10 @@
-#include "MCVideoPlayer.h"
+#include "MCVideoPlayTest.h"
 #include <QtWidgets/QApplication>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    MCVideoPlayer w;
+    MCVideoPlayTest w;
     w.show();
     return a.exec();
 }

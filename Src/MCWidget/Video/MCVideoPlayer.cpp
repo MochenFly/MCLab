@@ -17,14 +17,22 @@ MCVideoPlayer::~MCVideoPlayer()
 {
 }
 
-void MCVideoPlayer::setVideoFile(const QString& filePath)
+void MCVideoPlayer::setVideoFilePath(const QString& filePath)
 {
     m_videoFilePath = filePath;
 }
 
 void MCVideoPlayer::playVideo()
 {
+    // 播放视频，先停止视频
+    if (VideoState::StoppedState != m_state)
+    {
+        return;
+    }
+
+    // 更新为正在播放状态，更新为未暂停状态
     m_isPlaying = true;
+    m_isPause = false;
 
     // 创建新的线程，读取视频数据
     std::thread(&MCVideoPlayer::readVideo, this).detach();
@@ -37,17 +45,24 @@ bool MCVideoPlayer::readVideo()
         return false;
     }
 
+    // 重置视频流指针
     m_pVideoStream = nullptr;
 
+    // 重置读取完成状态，重置读取线程完成状态
     m_isReadFinished = false;
+    m_isReadThreadFinished = false;
 
+    // 分配视频格式 IO 上下文
     m_pFormatContext = avformat_alloc_context();
 
+    const char* videoFilePath = m_videoFilePath.toStdString().c_str();
+    qInfo() << "The video palyer: video file path" << videoFilePath;
+
     // 打开视频文件
-    int result = avformat_open_input(&m_pFormatContext, m_videoFilePath.toStdString().c_str(), nullptr, nullptr);
+    int result = avformat_open_input(&m_pFormatContext, videoFilePath, nullptr, nullptr);
     if (result < 0)
     {
-        qCritical() << "The video decoder error triggered: avformat_open_input failed";
+        qCritical() << "The video palyer error: avformat_open_input failed";
         //free();
         return false;
     }
@@ -56,7 +71,7 @@ bool MCVideoPlayer::readVideo()
     result = avformat_find_stream_info(m_pFormatContext, nullptr);
     if (result < 0)
     {
-        qCritical() << "The video decoder error triggered: avformat_find_stream_info failed";
+        qCritical() << "The video palyer error: avformat_find_stream_info failed";
         //free();
         return false;
     }
@@ -73,22 +88,35 @@ bool MCVideoPlayer::readVideo()
     }
     if (videoIndex < 0)
     {
-        qCritical() << "The video decoder error triggered: find video index failed";
+        qCritical() << "The video palyer error: find video index failed";
         //free();
         return false;
     }
 
     // 计算视频总时长
-    qint64 m_totalTime = m_pFormatContext->duration / (AV_TIME_BASE / 1000);
+    durationChanged(m_pFormatContext->duration);
+    qInfo() << "The video palyer: video duration" << m_pFormatContext->duration;
 
     // 通过视频流索引读取视频流
     m_pVideoStream = m_pFormatContext->streams[videoIndex];
+
+    // 视频帧率
+    double frameRate = 0.0;
+    if (0 != m_pVideoStream->avg_frame_rate.den)
+    {
+        frameRate = m_pVideoStream->avg_frame_rate.num * 1.0 / m_pVideoStream->avg_frame_rate.den;
+    }
+    qInfo() << "The video palyer: video frame rate" << frameRate;
+
+    // 视频总帧数
+    qint64 totalFrames = m_pVideoStream->nb_frames;
+    qInfo() << "The video palyer: video frame number" << totalFrames;
 
     // 查找视频解码器
     const AVCodec* pCodec = avcodec_find_decoder(m_pVideoStream->codecpar->codec_id);
     if (pCodec == nullptr)
     {
-        qCritical() << "The video decoder error triggered: avcodec_find_decoder failed";
+        qCritical() << "The video palyer error: avcodec_find_decoder failed";
         //free();+
         return false;
     }
@@ -97,7 +125,7 @@ bool MCVideoPlayer::readVideo()
     m_pCodecContext = avcodec_alloc_context3(pCodec);
     if (!m_pCodecContext)
     {
-        qCritical() << "The video decoder error triggered: avcodec_alloc_context3 failed";
+        qCritical() << "The video palyer error: avcodec_alloc_context3 failed";
         //free();
         return false;
     }
@@ -106,7 +134,7 @@ bool MCVideoPlayer::readVideo()
     result = avcodec_parameters_to_context(m_pCodecContext, m_pVideoStream->codecpar);
     if (result < 0)
     {
-        qCritical() << "The video decoder error triggered: avcodec_parameters_to_context failed";
+        qCritical() << "The video palyer error: avcodec_parameters_to_context failed";
         //free();
         return false;
     }
@@ -118,7 +146,7 @@ bool MCVideoPlayer::readVideo()
     result = avcodec_open2(m_pCodecContext, nullptr, nullptr);
     if (result < 0)
     {
-        qCritical() << "The video decoder error triggered: avcodec_open2 failed";
+        qCritical() << "The video palyer error: avcodec_open2 failed";
         //free();
         return false;
     }
@@ -126,16 +154,26 @@ bool MCVideoPlayer::readVideo()
     // 解码器打开后，创建新的线程，解码视频数据包
     std::thread(&MCVideoPlayer::decodeVideo, this).detach();
 
+    // 切换视频状态为正在播放状态
+    m_state = VideoState::PlayingState;
+    stateChanged(m_state);
+
+    // 记录视频开始时间
+    m_videoStartTime = av_gettime();
+
     // 读取视频数据循环
     while (m_isPlaying)
     {
+        // todo：优化视频播放、暂停状态下的循环控制
+
+
         if (m_seekFlag)
         {
             AVRational rational = {1, AV_TIME_BASE};
             qint64 seekTarget = av_rescale_q(m_seekPosition, rational, m_pVideoStream->time_base);
             if (av_seek_frame(m_pFormatContext, videoIndex, seekTarget, AVSEEK_FLAG_BACKWARD) < 0)
             {
-                qCritical() << "The video decoder error triggered: av_seek_frame failed";
+                qCritical() << "The video palyer error: av_seek_frame failed";
             }
             else
             {
@@ -150,6 +188,16 @@ bool MCVideoPlayer::readVideo()
             m_videoStartTime = av_gettime() - m_seekPosition;
         }
 
+        // 视频数据包队列数据包个数超过一定值，就暂停读取数据，等待数据解码，以防内存不足问题
+        m_mutex.lock();
+        if (m_maxVideoSize < m_listVideoPackts.size())
+        {
+            m_mutex.unlock();
+            sleepMsec(50);
+            continue;
+        }
+        m_mutex.unlock();
+
         /**
          * 读取视频数据
          * 前几帧，av_read_frame 读取结果不为空，avcodec_receive_frame 读取报错，错误返回值为 AVERROR(EAGAIN)
@@ -161,6 +209,7 @@ bool MCVideoPlayer::readVideo()
         {
             // 读取完成
             m_isReadFinished = true;
+            qInfo() << "The video palyer: video read finished";
             break;
         }
 
@@ -172,12 +221,13 @@ bool MCVideoPlayer::readVideo()
     }
 
     // 等待视频数据播放完成循环
-    while (m_isPlaying)
-    {
-        sleepMsec(100);
-    }
+    //while (m_isPlaying)
+    //{
+    //    sleepMsec(100);
+    //}
 
-    clearPacketList();
+    //clearPacketList();
+    return true;
 }
 
 void MCVideoPlayer::decodeVideo()
@@ -205,7 +255,7 @@ void MCVideoPlayer::decodeVideo()
     pFrame = av_frame_alloc();
     if (nullptr == pFrame)
     {
-        qCritical() << "The video decoder error triggered: av_frame_alloc failed";
+        qCritical() << "The video palyer error: av_frame_alloc failed";
         return;
     }
 
@@ -253,7 +303,7 @@ void MCVideoPlayer::decodeVideo()
 
         if (avcodec_send_packet(m_pCodecContext, pPacket) < 0)
         {
-           qCritical() << "The video decoder error triggered: avcodec_send_packet failed";
+           qCritical() << "The video palyer error: avcodec_send_packet failed";
            av_packet_unref(pPacket);
            continue;
         }
@@ -394,6 +444,16 @@ void MCVideoPlayer::clearPacketList()
     m_listVideoPackts.clear();
 
     m_mutex.unlock();
+}
+
+void MCVideoPlayer::durationChanged(qint64 duration)
+{
+    // todo：实现视频总时间变化
+}
+
+void MCVideoPlayer::stateChanged(VideoState state)
+{
+    // todo：实现视频播放状态切换
 }
 
 void MCVideoPlayer::sleepMsec(int msec)

@@ -1,4 +1,4 @@
-# MCVideoPlayer
+# MCVideoPlayTest
 
 Qt + FFmpeg 实现简易视频播放器
 

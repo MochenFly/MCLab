@@ -59,8 +59,8 @@
     <IntDir>$(SolutionDir)Temp\$(ProjectName)</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <OutDir>$(SolutionDir)Bin\$(ProjectName)</OutDir>
-    <IntDir>$(SolutionDir)Temp\$(ProjectName)</IntDir>
+    <OutDir>$(SolutionDir)Bin\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)Temp\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -78,7 +78,7 @@ copy "$(SolutionDir)Bin\$(ProjectName)\*.lib" "$(SolutionDir)Lib\$(ProjectName)\
 </Command>
     </PostBuildEvent>
     <Link>
-      <AdditionalDependencies>$(SolutionDir)Module\FFmpeg\FFmpeg-6.1.1\lib\avcodec.lib;$(SolutionDir)Module\FFmpeg\FFmpeg-6.1.1\lib\avdevice.lib;$(SolutionDir)Module\FFmpeg\FFmpeg-6.1.1\lib\avfilter.lib;$(SolutionDir)Module\FFmpeg\FFmpeg-6.1.1\lib\avformat.lib;$(SolutionDir)Module\FFmpeg\FFmpeg-6.1.1\lib\avutil.lib;$(SolutionDir)Module\FFmpeg\FFmpeg-6.1.1\lib\swresample.lib;$(SolutionDir)Module\FFmpeg\FFmpeg-6.1.1\lib\swscale.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)Module\FFmpeg\FFmpeg-6.1.1\lib\*.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
