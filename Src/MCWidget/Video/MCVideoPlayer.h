@@ -50,7 +50,7 @@ private:
 
 private:
     AVFormatContext*    m_pFormatContext            { nullptr };        // 视频格式 IO 上下文
-    AVCodecContext*     m_pCodecContext             { nullptr };        // 解码器上下文
+    AVCodecContext*     m_pReadCodecContext         { nullptr };        // 读取线程解码器上下文
     AVStream*           m_pVideoStream              { nullptr };        // 视频流 avformat_free_context
 
     QString             m_videoFilePath             { "" };
