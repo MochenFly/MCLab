@@ -3,6 +3,7 @@
 #include <QObject>
 #include <QMutex>
 #include "MCWidget_Global.h"
+#include "MCVideoFrame.h"
 
 extern "C"
 {
@@ -33,6 +34,9 @@ public:
 
     void setVideoFilePath(const QString& filePath);
     void playVideo();
+
+signals:
+    void sigFrameChanged(std::shared_ptr<MCVideoFrame> frame);
 
 private:
     bool readVideo();

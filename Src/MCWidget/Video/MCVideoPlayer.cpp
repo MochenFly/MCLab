@@ -7,10 +7,12 @@ USE_MCWIDGET_NAMESPACE
 #include <QImage>
 
 #include <thread>
+#include <algorithm>
 
 MCVideoPlayer::MCVideoPlayer(QObject* parent)
     : QObject(parent)
 {
+    qRegisterMetaType<std::shared_ptr<MCVideoFrame>>("std::shared_ptr<MCVideoFrame>");
 }
 
 MCVideoPlayer::~MCVideoPlayer()
@@ -428,15 +430,9 @@ void MCVideoPlayer::decodeVideo()
             sws_scale(pSwsContext, pFrame->data, pFrame->linesize, 0, videoHeight, pFrameYUV->data, pFrameYUV->linesize);
 
             // 渲染数据 (pFrameYUV, videoWidth, videoHeight)
-            QImage image(pFrame->width, pFrame->height, QImage::Format_RGB888);
-            // 创建指向目标图像数据的指针
-            uint8_t* dest[4] = { image.bits(), nullptr, nullptr, nullptr };
-            int destLinesize[4] = { image.bytesPerLine(), 0, 0, 0 };
-            // 使用 sws_scale 转换帧数据到目标图像
-            sws_scale(pSwsContext, pFrame->data, pFrame->linesize, 0, pFrame->height, dest, destLinesize);
-            index++;
-            QString fileame = "D:/Video/" + QString::number(index) + ".png";
-            image.save(fileame);
+            std::shared_ptr<MCVideoFrame> pVideoFrame = std::make_shared<MCVideoFrame>();
+            pVideoFrame.get()->setYUVData(pYUVBuffer, videoWidth, videoHeight);
+            emit sigFrameChanged(pVideoFrame);
             
             av_packet_unref(pPacket);
         }
