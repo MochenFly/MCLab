@@ -45,10 +45,14 @@ bool MCVideoPlayer::readVideo()
         return false;
     }
 
+    // 重置视频流指针
     m_pVideoStream = nullptr;
 
+    // 重置读取完成状态，重置读取线程完成状态
     m_isReadFinished = false;
+    m_isReadThreadFinished = false;
 
+    // 分配视频格式 IO 上下文
     m_pFormatContext = avformat_alloc_context();
 
     // 打开视频文件
@@ -87,7 +91,7 @@ bool MCVideoPlayer::readVideo()
     }
 
     // 计算视频总时长
-    qint64 m_totalTime = m_pFormatContext->duration / (AV_TIME_BASE / 1000);
+    durationChanged(m_pFormatContext->duration);
 
     // 通过视频流索引读取视频流
     m_pVideoStream = m_pFormatContext->streams[videoIndex];
@@ -134,9 +138,19 @@ bool MCVideoPlayer::readVideo()
     // 解码器打开后，创建新的线程，解码视频数据包
     std::thread(&MCVideoPlayer::decodeVideo, this).detach();
 
+    // 切换视频状态为正在播放状态
+    m_state = VideoState::PlayingState;
+    stateChanged(m_state);
+
+    // 记录视频开始时间
+    m_videoStartTime = av_gettime();
+
     // 读取视频数据循环
     while (m_isPlaying)
     {
+        // todo：优化视频播放、暂停状态下的循环控制
+
+
         if (m_seekFlag)
         {
             AVRational rational = {1, AV_TIME_BASE};
@@ -156,6 +170,13 @@ bool MCVideoPlayer::readVideo()
             }
 
             m_videoStartTime = av_gettime() - m_seekPosition;
+        }
+
+        // 视频数据包队列数据包个数超过一定值，就暂停读取数据，等待数据解码，以防内存不足问题
+        if (m_maxVideoSize < m_listVideoPackts.size())
+        {
+            sleepMsec(50);
+            continue;
         }
 
         /**
@@ -402,6 +423,16 @@ void MCVideoPlayer::clearPacketList()
     m_listVideoPackts.clear();
 
     m_mutex.unlock();
+}
+
+void MCVideoPlayer::durationChanged(qint64 duration)
+{
+    // todo：实现视频总时间变化
+}
+
+void MCVideoPlayer::stateChanged(VideoState state)
+{
+    // todo：实现视频播放状态切换
 }
 
 void MCVideoPlayer::sleepMsec(int msec)
