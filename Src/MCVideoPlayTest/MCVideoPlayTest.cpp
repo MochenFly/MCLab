@@ -10,7 +10,7 @@ MCVideoPlayTest::MCVideoPlayTest(QWidget* parent)
     m_pVideoPlayer = new MCWidget::MCVideoPlayer(this);
     connect(ui->btnPlay, &QPushButton::clicked, this, [&]()
     {
-        m_pVideoPlayer->setVideoFilePath(QString::fromLocal8Bit("D:/Resource/Video/»ÆÐ¡B.mp4"));
+        m_pVideoPlayer->setVideoFilePath(QString::fromLocal8Bit("D:/Resource/Video/testVideo.avi"));
         m_pVideoPlayer->playVideo();
     });
 }
