@@ -24,7 +24,15 @@ void MCVideoPlayer::setVideoFile(const QString& filePath)
 
 void MCVideoPlayer::playVideo()
 {
+    // 播放视频，先停止视频
+    if (VideoState::StoppedState != m_state)
+    {
+        return;
+    }
+
+    // 更新为正在播放状态，更新为未暂停状态
     m_isPlaying = true;
+    m_isPause = false;
 
     // 创建新的线程，读取视频数据
     std::thread(&MCVideoPlayer::readVideo, this).detach();
