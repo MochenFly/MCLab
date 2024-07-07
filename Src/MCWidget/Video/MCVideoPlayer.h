@@ -31,7 +31,7 @@ public:
     MCVideoPlayer(QObject *parent);
     ~MCVideoPlayer();
 
-    void setVideoFile(const QString& filePath);
+    void setVideoFilePath(const QString& filePath);
     void playVideo();
 
 private:
