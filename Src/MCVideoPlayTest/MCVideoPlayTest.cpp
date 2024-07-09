@@ -13,10 +13,15 @@ MCVideoPlayTest::MCVideoPlayTest(QWidget* parent)
     ui->sliderTime->setValueByCliucked(true);
 
     m_pVideoPlayer = new MCWidget::MCVideoPlayer(this);
+
     connect(ui->btnPlay, &QPushButton::clicked, this, [&]()
     {
         m_pVideoPlayer->setVideoFilePath(QString::fromLocal8Bit("D:/Resource/Video/testVideo.avi"));
         m_pVideoPlayer->playVideo();
+    });
+    connect(ui->btnStop, &QPushButton::clicked, this, [&](bool pause)
+    {
+        m_pVideoPlayer->pauseVideo(pause);
     });
 
     connect(m_pVideoPlayer, &MCWidget::MCVideoPlayer::sigFrameChanged, this, [&](std::shared_ptr<MCWidget::MCVideoFrame> frame)
