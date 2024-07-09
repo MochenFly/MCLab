@@ -84,6 +84,7 @@ private:
 
     qint64              m_videoStartTime;                               // 视频开始时间
     qint64              m_seekTime                  { 0 };              // 跳转位置
+    qint64              m_seekVideoStartTime                  { 0 };    // 跳转时视频开始时间位置
     qint64              m_currentTime               { 0 };
 
     QList<AVPacket>     m_listVideoPackets;
