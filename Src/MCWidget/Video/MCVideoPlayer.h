@@ -2,6 +2,7 @@
 
 #include <QObject>
 #include <QMutex>
+#include <QTimer>
 #include "MCWidget_Global.h"
 #include "MCVideoFrame.h"
 
@@ -29,19 +30,31 @@ public:
         PausedState
     };
 
-    MCVideoPlayer(QObject *parent);
+    MCVideoPlayer(QObject* parent);
     ~MCVideoPlayer();
 
     void setVideoFilePath(const QString& filePath);
+
     void playVideo();
+
+    void seek(qint64 seekTime);
+
+    void startTimer();
+    void stopTimer();
 
 signals:
     void sigFrameChanged(std::shared_ptr<MCVideoFrame> frame);
+    void sigTimeChanged(qint64 time);
+    void sigStateChanged(VideoState state);
 
 private:
-    bool readVideo();
-    void decodeVideo();
-   
+    bool readVideoStart();
+    void readVideoExit();
+    void freeReadData();
+
+    void decodeVideoStart();
+    void decodeVideoExit();
+
     bool addPacket(const AVPacket& pkt);
     void clearPacketList();
 
@@ -50,36 +63,37 @@ private:
     // 视频播放状态变化
     void stateChanged(VideoState state);
 
-    void sleepMsec(int msec);
+private slots:
+    void timerTimeOut();
 
 private:
     AVFormatContext*    m_pFormatContext            { nullptr };        // 视频格式 IO 上下文
-    AVCodecContext*     m_pReadCodecContext         { nullptr };        // 读取线程解码器上下文
-    AVStream*           m_pVideoStream              { nullptr };        // 视频流 avformat_free_context
+    AVStream*           m_pVideoStream              { nullptr };        // 视频流
+    AVCodecContext*     m_pCodecContext             { nullptr };        // 解码器上下文
 
     QString             m_videoFilePath             { "" };
-
     VideoState          m_state                     { VideoState::StoppedState};
 
-    bool                m_isPlaying                 { false };          // 是否正在播放
+    bool                m_isStopped                 { false };          // 是否正在播放
     bool                m_isPause                   { false };          // 是否正在暂停
     bool                m_isReadFinished            { false };          // 是否读取完成
     bool                m_isReadThreadFinished      { false };          // 是否读取线程完成
     bool                m_isDecodeThreadFinished    { false };          // 是否解码线程完成
-
-    bool                m_seekFlag                  { false };          // 跳转标志
-    qint64              m_seekPosition              { 0 };              // 跳转位置
+    bool                m_seekRequestFlag           { false };          // 跳转请求标志
+    bool                m_seekFrameFlag             { false };          // 跳转完成标志
 
     qint64              m_videoStartTime;                               // 视频开始时间
+    qint64              m_seekTime                  { 0 };              // 跳转位置
+    qint64              m_currentTime               { 0 };
 
-    QList<AVPacket>     m_listVideoPackts;
+    QList<AVPacket>     m_listVideoPackets;
 
-    const char*         m_flushData                 { "FLUSH_DATA" };
+    QMutex              m_mutex;                                        // 互斥锁   
+
+    QTimer*             m_pTimer;
+
     const int           m_maxVideoSize              { 500 };
-
-    QMutex              m_mutex;                                        // 互斥锁      
-
-    int                 index                       { 0 };
+    const char*         m_flushData                 { "FLUSH_DATA" };
 };
 
 MCWIDGET_END_NAMESPACE
