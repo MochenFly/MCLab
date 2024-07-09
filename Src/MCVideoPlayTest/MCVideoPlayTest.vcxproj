@@ -62,9 +62,7 @@
       <AdditionalDependencies>$(SolutionDir)Lib\MCWidget\MCWidget.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(SolutionDir)Bin\MCWidget\MCWidget.dll" "$(OutDir)MCWidget.dll"
-copy "$(SolutionDir)Bin\MCWidget\MCWidget.pdb" "$(OutDir)MCWidget.pdb"
-
+      <Command>copy "$(SolutionDir)Bin\MCWidget\MCWidget.*" "$(OutDir)MCWidget.*"
 copy "$(SolutionDir)Module\FFmpeg\FFmpeg-6.1.1\bin\*.dll" "$(OutDir)*.dll"
 </Command>
     </PostBuildEvent>
