@@ -36,6 +36,7 @@ public:
     void setVideoFilePath(const QString& filePath);
 
     void playVideo();
+    void pauseVideo(bool pause);
 
     void seek(qint64 seekTime);
 

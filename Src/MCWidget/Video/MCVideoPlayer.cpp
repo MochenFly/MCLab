@@ -42,6 +42,16 @@ void MCVideoPlayer::playVideo()
     std::thread(&MCVideoPlayer::readVideoStart, this).detach();
 }
 
+void MCVideoPlayer::pauseVideo(bool pause)
+{
+    //if (VideoState::PlayingState != m_state)
+    //{
+    //    return;
+    //}
+
+    m_isPause = pause;
+}
+
 void MCVideoPlayer::seek(qint64 seekTime)
 {
     if (!m_seekRequestFlag)
@@ -198,26 +208,6 @@ bool MCVideoPlayer::readVideoStart()
             break;
         }
 
-        if (m_isPause)
-        {
-            // 视频暂停，等待恢复
-            Sleep(50);
-            continue;
-        }
-
-        if (m_isReadFinished)
-        {
-            if (m_isStopped)
-            {
-                // 读取完成，并且停止，可以退出读取循环
-                break;
-            }
-
-            // 读取完成，并未停止，等待解码线程停止
-            Sleep(50);
-            continue;
-        } 
-
         if (m_seekRequestFlag)
         {
             // 根据时间，和一帧所用的时间，计算结果 seekTarget 即跳转目标帧的编号
@@ -249,6 +239,13 @@ bool MCVideoPlayer::readVideoStart()
         if (m_maxVideoSize < m_listVideoPackets.size())
         {
             Sleep(10);
+            continue;
+        }
+
+        if (m_isPause)
+        {
+            // 视频暂停，等待恢复
+            Sleep(50);
             continue;
         }
 
