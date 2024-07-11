@@ -3,6 +3,8 @@
 #include <QtWidgets/QMainWindow>
 
 #include "MCWidget/MCVideoPlayer.h"
+#include "MCWidget/MCVideoWidget.h"
+#include "MCWidget/MCVideoFrame.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MCVideoPlayTest; };
@@ -20,4 +22,5 @@ private:
     Ui::MCVideoPlayTest*        ui;
 
     MCWidget::MCVideoPlayer*    m_pVideoPlayer      { nullptr };
+    MCWidget::MCVideoWidget*    m_pVideoWidget      { nullptr };
 };

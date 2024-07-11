@@ -11,12 +11,21 @@
     <Filter Include="Video">
       <UniqueIdentifier>{47f01226-0f46-4eb1-b762-4b50d875a1b2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource">
+      <UniqueIdentifier>{7691d853-5e11-42e7-b857-eb003e795d80}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="InputWidgets\MCSlider.cpp">
       <Filter>InputWidgets</Filter>
     </ClCompile>
     <ClCompile Include="Video\MCVideoPlayer.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
+    <ClCompile Include="Video\MCVideoWidget.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
+    <ClCompile Include="Video\MCVideoFrame.cpp">
       <Filter>Video</Filter>
     </ClCompile>
   </ItemGroup>
@@ -27,10 +36,21 @@
     <QtMoc Include="Video\MCVideoPlayer.h">
       <Filter>Video</Filter>
     </QtMoc>
+    <QtMoc Include="Video\MCVideoWidget.h">
+      <Filter>Video</Filter>
+    </QtMoc>
+    <QtMoc Include="Video\MCVideoFrame.h">
+      <Filter>Video</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Global\MCWidget_Global.h">
       <Filter>Global</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <QtRcc Include="Resource.qrc">
+      <Filter>Resource</Filter>
+    </QtRcc>
   </ItemGroup>
 </Project>
