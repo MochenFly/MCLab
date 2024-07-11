@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
+    <width>1422</width>
     <height>600</height>
    </rect>
   </property>
@@ -49,11 +49,18 @@
      </widget>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0,0">
+     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0,0,0">
       <item>
        <widget class="QPushButton" name="btnPlay">
         <property name="text">
          <string>play</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnPause">
+        <property name="text">
+         <string>pause</string>
         </property>
        </widget>
       </item>
@@ -83,9 +90,6 @@
       </item>
       <item>
        <widget class="MCWidget::MCSlider" name="sliderTime">
-        <property name="maximum">
-         <number>28800000</number>
-        </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
