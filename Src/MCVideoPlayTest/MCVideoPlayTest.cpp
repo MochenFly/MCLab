@@ -5,6 +5,7 @@ MCVideoPlayTest::MCVideoPlayTest(QWidget* parent)
     : QMainWindow(parent)
     , ui(new Ui::MCVideoPlayTest())
 {
+
     ui->setupUi(this);
 
     m_pVideoWidget = new MCWidget::MCVideoWidget(ui->wgtVideo);
@@ -13,16 +14,14 @@ MCVideoPlayTest::MCVideoPlayTest(QWidget* parent)
     ui->sliderTime->setValueByCliucked(true);
 
     m_pVideoPlayer = new MCWidget::MCVideoPlayer(this);
+    m_pVideoPlayer->setLogEnabled(true);
 
     connect(ui->btnPlay, &QPushButton::clicked, this, [&]()
     {
-        m_pVideoPlayer->setVideoFilePath(QString::fromLocal8Bit("D:/Resource/Video/testVideo.avi"));
+        m_pVideoPlayer->setVideoFilePath(QString::fromLocal8Bit("D:/Resource/Video/²âÊÔÊÓÆµ.avi"));
         m_pVideoPlayer->playVideo();
     });
-    connect(ui->btnPause, &QPushButton::clicked, this, [&](bool pause)
-    {
-        m_pVideoPlayer->pauseVideo(pause);
-    });
+
     connect(ui->btnStop, &QPushButton::clicked, this, [&]()
     {
         m_pVideoPlayer->stopVideo();
@@ -47,7 +46,7 @@ MCVideoPlayTest::MCVideoPlayTest(QWidget* parent)
 
     connect(ui->sliderTime, &QSlider::valueChanged, this, [&](int value)
     {
-        m_pVideoPlayer->seek(value);
+        m_pVideoPlayer->seekVideio(value);
     });
 
     connect(m_pVideoPlayer, &MCWidget::MCVideoPlayer::sigStateChanged, this, [&](MCWidget::MCVideoPlayer::VideoState state)
@@ -55,6 +54,10 @@ MCVideoPlayTest::MCVideoPlayTest(QWidget* parent)
         if (MCWidget::MCVideoPlayer::VideoState::PlayingState == state)
         {
             m_pVideoPlayer->startTimer();
+        }
+        else
+        {
+            m_pVideoPlayer->stopTimer();
         }
     }, Qt::BlockingQueuedConnection);
 }
