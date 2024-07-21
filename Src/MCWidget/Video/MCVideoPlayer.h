@@ -27,8 +27,7 @@ public:
     enum VideoState
     {
         StoppedState,
-        PlayingState,
-        PausedState
+        PlayingState
     };
 
     MCVideoPlayer(QObject* parent);
@@ -42,12 +41,12 @@ public:
     // 停止视频
     void stopVideo();
     // 跳转视频
-    void seekVideio(qint64 seekTime);
+    void seekVideo(qint64 seekTime);
 
-    // 开启定时器
-    void startTimer();
-    // 停止定时器
-    void stopTimer();
+    // 获取视频播放状态
+    VideoState getState();
+
+    qint64 getCurrentTime();
 
     // 设置日志启用状态
     void setLogEnabled(bool enabled);
@@ -57,14 +56,12 @@ signals:
     void sigDurationChanged(qint64 msecond);
     // 视频帧变化
     void sigFrameChanged(std::shared_ptr<MCVideoFrame> frame);
-    // 视频时间变化
-    void sigTimeChanged(qint64 time);
     // 视频播放状态变化
     void sigStateChanged(VideoState state);
 
 private:
     // 打开视频
-    void openVideo();
+    bool openVideo();
     // 关闭视频
     void closeVideo();
     // 读取视频
@@ -73,29 +70,23 @@ private:
     void decodeVideo();
 
     // 添加数据包到列表
-    void addPacket(const AVPacket& pkt);
+    void addPacket(AVPacket* pPacket);
     // 清空数据包对流
     void clearPacketList();
 
     // 打印日志
     void printLog(const QString& log, bool isError = false);
 
-private slots:
-    void timerTimeOut();
-
 private:
     QString             m_videoFilePath             { "" };             // 视频路径
 
-    VideoState          m_state                     { StoppedState};    // 视频播放状态
+    VideoState          m_state                     { StoppedState };   // 视频播放状态
 
     AVFormatContext*    m_pFormatContext            { nullptr };        // 视频格式 IO 上下文
     AVStream*           m_pVideoStream              { nullptr };        // 视频流
     AVCodecContext*     m_pCodecContext             { nullptr };        // 解码器上下文
 
     bool                m_isStopped                 { false };          // 视频播放状态
-
-    bool                m_isOpenFinished            { false };          // 打开视频状态
-    bool                m_isOpenThreadFinished      { true };           // 打开视频线程状态
 
     bool                m_isReadFinished            { false };          // 读取视频状态
     bool                m_isReadThreadFinished      { true };           // 读取视频线程状态
@@ -106,14 +97,18 @@ private:
     bool                m_seekRequestFlag           { false };          // 跳转请求标志
     bool                m_seekFrameFlag             { false };          // 跳转完成标志
 
-    bool                m_decodeOneFrameRequsetFlag { false };
-    bool                m_decodeOneFrameFlag        { false };
+    bool                m_decodeOneFrameRequsetFlag { false };          // 解码一帧请求标志
+    bool                m_decodeOneFrameFlag        { false };          // 解码一帧完成标志
 
     bool                m_isLogEnabled              { false };          // 日志启用状态
 
     qint64              m_videoIndex                { -1 };             // 视频流索引
+    qint64              m_oneFrameTime              { 0 };              // 视频一帧时间
+    double              m_videoFrameRate            { 0.0 };            // 视频帧率
 
-    qint64              m_videoStartTime;                               // 视频开始时间
+    qint64              m_videoStartTime            { 0 };              // 视频开始时间
+
+    qint64              m_currentFrameIndex         { 0 };              // 当前视频帧索引
 
     qint64              m_currentTime               { 0 };              // 当前视频播放进度时间
 
@@ -122,17 +117,15 @@ private:
 
     qint64              m_readFrameCount            { 0 };              // 读取视频帧数量
 
-    QList<AVPacket>     m_listVideoPackets;                             // 视频数据包列表
+    QList<AVPacket*>    m_listVideoPackets;                             // 视频数据包列表
 
     QMutex              m_mutex;                                        // 互斥锁   
+                     
+    const qint64        m_msecondTimeBase           { 1000 };           // 单位转换，毫秒
 
-    QTimer*             m_pTimer;                                       // 更新视频进度定时器
+    const char*         m_flushFlagChar             { "FLUSH_FLAG" };   // 视频 buffer 刷新标志字符
 
-    const static qint64 s_msecondTimeBase;                              // 单位转换，毫秒
-
-    const static char*  s_flushFlagChar;                                // 视频 buffer 刷新标志字符
-
-    const static int    s_videoReadLimitNumver;                         // 视频读取限制数量
+    const int           m_videoReadLimitNumber      { 500 };            // 视频读取限制数量  
 };
 
 MCWIDGET_END_NAMESPACE
