@@ -38,22 +38,24 @@ public:
 
     // 播放视频
     void playVideo();
+    // 播放一帧视频
+    void playOneFrame(int frameTime);
     // 停止视频
     void stopVideo();
     // 跳转视频
-    void seekVideo(qint64 seekTime);
+    void seekVideo(int seekTime);
 
     // 获取视频播放状态
     VideoState getState();
 
-    qint64 getCurrentTime();
+    int getCurrentTime();
 
     // 设置日志启用状态
     void setLogEnabled(bool enabled);
 
 signals:
     // 视频总时长变化
-    void sigDurationChanged(qint64 msecond);
+    void sigDurationChanged(int msecond);
     // 视频帧变化
     void sigFrameChanged(std::shared_ptr<MCVideoFrame> frame);
     // 视频播放状态变化
@@ -95,33 +97,33 @@ private:
     bool                m_isDecodeThreadFinished    { true };           // 解码视频线程状态
 
     bool                m_seekRequestFlag           { false };          // 跳转请求标志
-    bool                m_seekFrameFlag             { false };          // 跳转完成标志
+    bool                m_seekFrameFlag             { false };          // 跳转执行标志
 
     bool                m_decodeOneFrameRequsetFlag { false };          // 解码一帧请求标志
     bool                m_decodeOneFrameFlag        { false };          // 解码一帧完成标志
 
     bool                m_isLogEnabled              { false };          // 日志启用状态
 
-    qint64              m_videoIndex                { -1 };             // 视频流索引
-    qint64              m_oneFrameTime              { 0 };              // 视频一帧时间
+    int                 m_videoIndex                { -1 };             // 视频流索引
+    int                 m_oneFrameTime              { 0 };              // 视频一帧时间
     double              m_videoFrameRate            { 0.0 };            // 视频帧率
 
-    qint64              m_videoStartTime            { 0 };              // 视频开始时间
+    int                 m_videoStartTime            { 0 };              // 视频开始时间
 
-    qint64              m_currentFrameIndex         { 0 };              // 当前视频帧索引
+    int                 m_currentFrameIndex         { 0 };              // 当前视频帧索引
 
-    qint64              m_currentTime               { 0 };              // 当前视频播放进度时间
+    int                 m_currentTime               { 0 };              // 当前视频播放进度时间
 
-    qint64              m_seekTime                  { 0 };              // 跳转时间
-    qint64              m_seekVideoStartTime        { 0 };              // 跳转时视频开始时间位置
+    int                 m_seekTime                  { 0 };              // 跳转时间
+    int                 m_seekVideoStartTime        { 0 };              // 跳转时视频开始时间位置
 
-    qint64              m_readFrameCount            { 0 };              // 读取视频帧数量
+    int                 m_readFrameCount            { 0 };              // 读取视频帧数量
 
     QList<AVPacket*>    m_listVideoPackets;                             // 视频数据包列表
 
     QMutex              m_mutex;                                        // 互斥锁   
                      
-    const qint64        m_msecondTimeBase           { 1000 };           // 单位转换，毫秒
+    const int           m_msecondTimeBase           { 1000 };           // 单位转换，毫秒
 
     const char*         m_flushFlagChar             { "FLUSH_FLAG" };   // 视频 buffer 刷新标志字符
 

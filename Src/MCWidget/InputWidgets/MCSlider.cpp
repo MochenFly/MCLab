@@ -27,7 +27,7 @@ void MCSlider::setValueByCliucked(bool valueByCliucked)
 
 void MCSlider::mousePressEvent(QMouseEvent* event)
 {
-    if (m_valueByCliucked)
+    if (isEnabled() && m_valueByCliucked)
     {
         QStyleOptionSlider opt;
         initStyleOption(&opt);
@@ -50,7 +50,6 @@ void MCSlider::mousePressEvent(QMouseEvent* event)
                 value = QStyle::sliderValueFromPosition(minimum(), maximum(), event->pos().y(), height());
                 setValue(value);
             }
-            emit valueChanged(value);
         }
     }
     else
