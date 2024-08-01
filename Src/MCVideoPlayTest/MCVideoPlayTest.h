@@ -21,13 +21,13 @@ public:
 private slots:
     void timerTimeOut();
     void videoPlayOrStop();
-    void videoSeek(qint64 seekTime);
-    void videoDurationChanged(qint64 msecond);
+    void videoSeek(int seekTime);
+    void videoDurationChanged(int msecond);
     void videoFrameChanged(std::shared_ptr<MCWidget::MCVideoFrame> frame);
     void videoStateChanged(MCWidget::MCVideoPlayer::VideoState state);
 
 private:
-    QString getTimeString(qint64 msecond);
+    QString getTimeString(int msecond);
 
 private:
     Ui::MCVideoPlayTest*        ui;

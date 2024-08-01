@@ -13,7 +13,7 @@ MCVideoPlayTest::MCVideoPlayTest(QWidget* parent)
     ui->sliderTime->setValueByCliucked(true);
 
     m_pVideoPlayer = new MCWidget::MCVideoPlayer(this);
-    m_pVideoPlayer->setVideoFilePath(QString::fromLocal8Bit("D:/Resource/Video/testVideo.mp4"));
+    m_pVideoPlayer->setVideoFilePath(QString::fromLocal8Bit("D:/Resource/Video/test.mp4"));
 
     m_pTimer = new QTimer(this);
     connect(m_pTimer, &QTimer::timeout, this, &MCVideoPlayTest::timerTimeOut);
@@ -42,7 +42,7 @@ MCVideoPlayTest::~MCVideoPlayTest()
 
 void MCVideoPlayTest::timerTimeOut()
 {
-    qint64 currentTime = m_pVideoPlayer->getCurrentTime();
+    int currentTime = m_pVideoPlayer->getCurrentTime();
     ui->sliderTime->blockSignals(true);
     ui->sliderTime->setValue(currentTime);
     ui->sliderTime->blockSignals(false);
@@ -54,6 +54,13 @@ void MCVideoPlayTest::videoPlayOrStop()
     MCWidget::MCVideoPlayer::VideoState state = m_pVideoPlayer->getState();
     if (MCWidget::MCVideoPlayer::VideoState::StoppedState == state)
     {
+        int min = ui->sliderTime->minimum();
+        int max = ui->sliderTime->maximum();
+        int value = ui->sliderTime->value();
+        if (min != value && max != value)
+        {
+            m_pVideoPlayer->seekVideo(value);
+        }
         m_pVideoPlayer->playVideo();
     }
     else
@@ -62,13 +69,20 @@ void MCVideoPlayTest::videoPlayOrStop()
     }
 }
 
-void MCVideoPlayTest::videoSeek(qint64 seekTime)
+void MCVideoPlayTest::videoSeek(int seekTime)
 {
-    m_pVideoPlayer->seekVideo(seekTime);
+    if (MCWidget::MCVideoPlayer::VideoState::StoppedState == m_pVideoPlayer->getState())
+    {
+        m_pVideoPlayer->playOneFrame(seekTime);
+    }
+    else
+    {
+        m_pVideoPlayer->seekVideo(seekTime);
+    }
     ui->labelCurrentTime->setText(getTimeString(seekTime));
 }
 
-void MCVideoPlayTest::videoDurationChanged(qint64 msecond)
+void MCVideoPlayTest::videoDurationChanged(int msecond)
 {
     ui->sliderTime->setRange(0, msecond);
     ui->labelTotalTime->setText(getTimeString(msecond));
@@ -77,16 +91,6 @@ void MCVideoPlayTest::videoDurationChanged(qint64 msecond)
 void MCVideoPlayTest::videoFrameChanged(std::shared_ptr<MCWidget::MCVideoFrame> frame)
 {
     m_pVideoWidget->updateFrame(frame);
-}
-
-QString MCVideoPlayTest::getTimeString(qint64 msecond)
-{
-    qint64 hours = msecond / 3600000;
-    qint64 mseconds = msecond % 3600000;
-    qint64 minutes = mseconds / 60000;
-    mseconds = mseconds % 60000;
-    qint64 seconds = mseconds / 1000;
-    return QString("%1:%2:%3").arg(hours, 2, 10, QChar('0')).arg(minutes, 2, 10, QChar('0')).arg(seconds, 2, 10, QChar('0'));
 }
 
 void MCVideoPlayTest::videoStateChanged(MCWidget::MCVideoPlayer::VideoState state)
@@ -102,4 +106,14 @@ void MCVideoPlayTest::videoStateChanged(MCWidget::MCVideoPlayer::VideoState stat
         m_pTimer->stop();
         timerTimeOut();
     }
+}
+
+QString MCVideoPlayTest::getTimeString(int msecond)
+{
+    int hours = msecond / 3600000;
+    int mseconds = msecond % 3600000;
+    int minutes = mseconds / 60000;
+    mseconds = mseconds % 60000;
+    int seconds = mseconds / 1000;
+    return QString("%1:%2:%3").arg(hours, 2, 10, QChar('0')).arg(minutes, 2, 10, QChar('0')).arg(seconds, 2, 10, QChar('0'));
 }
