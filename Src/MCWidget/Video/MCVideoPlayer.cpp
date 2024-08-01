@@ -30,9 +30,28 @@ void MCVideoPlayer::setVideoFilePath(const QString& filePath)
 
 void MCVideoPlayer::playVideo()
 {
-    if (VideoState::StoppedState == m_state && m_isReadThreadFinished)
+    if (m_isReadThreadFinished)
     {
         std::thread(&MCVideoPlayer::readVideo, this).detach();
+    }
+    else
+    {
+        QString state = QString("video play failed, state %1, read thread state %2").arg(m_state).arg(m_isReadThreadFinished);
+        printLog(state, true);
+    }
+}
+
+void MCVideoPlayer::playOneFrame(int frameTime)
+{
+    // 视频停止状态下跳转视频，只解码一帧数据
+    // 确保读取线程停止，否则会因为冲突导致崩溃
+    if (m_isReadThreadFinished && !m_seekRequestFlag)
+    {
+        m_seekRequestFlag = true;
+        m_seekTime = frameTime;
+
+        m_decodeOneFrameRequsetFlag = true;
+        playVideo();
     }
 }
 
@@ -42,32 +61,16 @@ void MCVideoPlayer::stopVideo()
 
     while (!m_isReadThreadFinished)
     {
-        Sleep(5);
+        Sleep(1);
     }
 }
 
-void MCVideoPlayer::seekVideo(qint64 seekTime)
+void MCVideoPlayer::seekVideo(int seekTime)
 {
-    if (VideoState::StoppedState == m_state)
+    if (!m_seekRequestFlag)
     {
-        // 视频停止状态下跳转视频，只解码一帧数据
-        // 确保读取线程停止，否则会因为冲突导致崩溃
-        if (m_isReadThreadFinished && !m_seekRequestFlag)
-        {
-            m_seekRequestFlag = true;
-            m_seekTime = seekTime;
-
-            m_decodeOneFrameRequsetFlag = true;
-            playVideo();
-        }
-    }
-    else
-    {
-        if (!m_seekRequestFlag)
-        {
-            m_seekRequestFlag = true;
-            m_seekTime = seekTime;
-        }
+        m_seekRequestFlag = true;
+        m_seekTime = seekTime;
     }
 }
 
@@ -76,8 +79,13 @@ MCVideoPlayer::VideoState MCVideoPlayer::getState()
     return m_state;
 }
 
-qint64 MCVideoPlayer::getCurrentTime()
+int MCVideoPlayer::getCurrentTime()
 {
+    // 跳转阶段返回跳转时间
+    if (m_seekRequestFlag || m_seekFrameFlag)
+    {
+        return m_seekTime;
+    }
     return m_currentTime;
 }
 
@@ -165,7 +173,7 @@ bool MCVideoPlayer::openVideo()
     }
 
     // 视频总帧数
-    qint64 totalFrames = m_pVideoStream->nb_frames;
+    int totalFrames = m_pVideoStream->nb_frames;
     printLog(QString("video frame number %1").arg(totalFrames));
 
     // 查找视频解码器
@@ -203,6 +211,9 @@ bool MCVideoPlayer::openVideo()
         closeVideo();
         return false;
     }
+
+    // 使用 8 线程解码
+    m_pCodecContext->thread_count = 8;
 
     printLog(QString("video open finished"));
 
@@ -267,7 +278,7 @@ bool MCVideoPlayer::readVideo()
         {
             // 根据时间，和一帧所用的时间，计算结果 seekTarget 即跳转目标帧的编号
             AVRational rational = { 1, m_msecondTimeBase };
-            qint64 seekTarget = av_rescale_q(m_seekTime, rational, m_pVideoStream->time_base);
+            int seekTarget = av_rescale_q(m_seekTime, rational, m_pVideoStream->time_base);
             if (av_seek_frame(m_pFormatContext, m_videoIndex, seekTarget, AVSEEK_FLAG_BACKWARD) < 0)
             {
                 printLog("read video failed to av_seek_frame", true);
@@ -283,20 +294,17 @@ bool MCVideoPlayer::readVideo()
                 clearPacketList();
                 addPacket(pPacket);
 
+                // 记录跳转开始时间
                 m_seekVideoStartTime = av_gettime() / m_msecondTimeBase - m_seekTime;
 
+                // 重置读取帧计数
                 m_readFrameCount = 0;
 
+                // 更新跳转执行标志
                 m_seekFrameFlag = true;
 
-                // 跳转之后，更新读取视频状态为未完成状态
+                // 更新读取视频状态为未完成状态
                 m_isReadFinished = false;
-
-                if (m_decodeOneFrameRequsetFlag)
-                {
-                    // 如果请求只解码一帧数据，则更新视频开始时间
-                    m_videoStartTime = m_seekVideoStartTime;
-                }
             }
             m_seekRequestFlag = false;
         }
@@ -304,7 +312,7 @@ bool MCVideoPlayer::readVideo()
         // 视频数据包列表数据包个数超过一定值，就暂停读取数据，等待数据解码，以防内存不足问题
         if (m_videoReadLimitNumber < m_listVideoPackets.size())
         {
-            Sleep(5);
+            Sleep(1);
             continue;
         }
 
@@ -350,7 +358,7 @@ bool MCVideoPlayer::readVideo()
     // 确保解码线程结束，再停止线程
     while (!m_isDecodeThreadFinished)
     {
-        Sleep(5);
+        Sleep(1);
     }
 
     // 停止播放
@@ -386,7 +394,7 @@ void MCVideoPlayer::decodeVideo()
     int videoHeight = 0;
 
     // 当前视频帧编号
-    qint64 currentFrameIndex = 0;
+    int currentFrameIndex = 0;
     // 当前视频帧时间
     double currentFrameTime = 0;
 
@@ -403,8 +411,6 @@ void MCVideoPlayer::decodeVideo()
     pFrame = av_frame_alloc();
 
     // 解码视频数据循环
-    int sendCount = 0;
-    int recvCount = 0;
     while (1)
     {
         if (m_isStopped)
@@ -428,7 +434,7 @@ void MCVideoPlayer::decodeVideo()
             m_mutex.unlock();
 
             // 视频数据列表为空，但未读取完成，等待读取视频数据
-            Sleep(5);
+            Sleep(1);
             continue;
         }
         AVPacket* pPacket = m_listVideoPackets.first();
@@ -441,17 +447,20 @@ void MCVideoPlayer::decodeVideo()
             printLog("decode video flush buffer");
             avcodec_flush_buffers(m_pCodecContext);
             av_packet_unref(pPacket);
+
+            // 更新视频开始时间
+            m_videoStartTime = m_seekVideoStartTime;
+
+            // seek 之后，av_read_frame 读取内容依旧从第一帧开始，m_currentFrameIndex 重置为 0
+            m_currentFrameIndex = 0;
+
             continue;
         }
 
         // 将数据包传送到解码器
-        int sendResult = avcodec_send_packet(m_pCodecContext, pPacket);
-        sendCount++;
-        qDebug() << "sendCount" << sendCount << "sendResult" << sendResult;
+        avcodec_send_packet(m_pCodecContext, pPacket);
 
-        //if (avcodec_receive_frame(m_pCodecContext, pFrame) < 0)
-        int recvResult = avcodec_receive_frame(m_pCodecContext, pFrame);
-        if (recvResult < 0)
+        if (avcodec_receive_frame(m_pCodecContext, pFrame) < 0)
         {
             if (m_isReadFinished && nullptr == pPacket->data)
             {
@@ -464,9 +473,6 @@ void MCVideoPlayer::decodeVideo()
             av_packet_unref(pPacket);
             continue;
         }
-        recvCount++;
-        qDebug() << "recvCount" << recvCount << "recvResult" << recvResult;
-
         ++m_currentFrameIndex;
 
         // 计算当前帧对应的时间
@@ -478,9 +484,6 @@ void MCVideoPlayer::decodeVideo()
             // 舍弃跳转前的帧，直接 continue
             if (m_seekVideoStartTime != m_videoStartTime)
             {
-                m_videoStartTime = m_seekVideoStartTime;
-                m_currentFrameIndex = m_seekTime / m_oneFrameTime;
-
                 av_packet_unref(pPacket);
                 continue;
             }
@@ -638,11 +641,11 @@ void MCVideoPlayer::printLog(const QString& log, bool isError)
     {
         if (isError)
         {
-            qCritical() << QString("The video palyer error: %1").arg(log);
+            qCritical() << QString("The video player error: %1").arg(log);
         }
         else
         {
-            qInfo() << QString("The video palyer: %1").arg(log);
+            qInfo() << QString("The video player: %1").arg(log);
         }
     }
 }
