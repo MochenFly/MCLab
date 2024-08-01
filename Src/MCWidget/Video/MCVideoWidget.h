@@ -21,9 +21,7 @@ public:
     void updateFrame(std::shared_ptr<MCWidget::MCVideoFrame> frame);
 
 private:
-    void setVideoWidth(int width, int height);
-
-    void resetGLVertex(int window_W, int window_H);
+    void updateGLVertex(int windowWidth, int widowHeight);
 
 protected:
     void initializeGL() override;
@@ -31,34 +29,24 @@ protected:
     void paintGL() override;
 
 private:
-    QOpenGLShader* m_pVertexShader;  //顶点着色器程序对象
-    QOpenGLShader* m_pFragmentShader;  //片段着色器对象
+    QOpenGLShader*          m_pVertexShader;        // 顶点着色器
+    QOpenGLShader*          m_pFragmentShader;      // 片段着色器
+    QOpenGLShaderProgram*   m_pShaderProgram;       // 着色器程序
 
-    int m_videoWidth;
-    int m_videoHeight;
+    QOpenGLTexture*         m_pTextureY;            // Y 纹理对象
+    QOpenGLTexture*         m_pTextureU;            // U 纹理对象
+    QOpenGLTexture*         m_pTextureV;            // V 纹理对象
 
-    ///OPenGL用于绘制图像
-    GLuint textureUniformY; //y纹理数据位置
-    GLuint textureUniformU; //u纹理数据位置
-    GLuint textureUniformV; //v纹理数据位置
-    GLuint id_y; //y纹理对象ID
-    GLuint id_u; //u纹理对象ID
-    GLuint id_v; //v纹理对象ID
-    QOpenGLTexture* m_pTextureY;  //y纹理对象
-    QOpenGLTexture* m_pTextureU;  //u纹理对象
-    QOpenGLTexture* m_pTextureV;  //v纹理对象
-    QOpenGLShaderProgram* m_pShaderProgram; //着色器程序容器
-    QOpenGLShaderProgram* m_program;
-    GLfloat* m_vertexVertices; // 顶点矩阵
+    GLuint                  m_textureIdY;           // Y 纹理对象 id
+    GLuint                  m_textureIdU;           // U 纹理对象 id
+    GLuint                  m_textureIdV;           // V 纹理对象 id
 
-    float mPicIndex_X; //按比例显示情况下 图像偏移量百分比 (相对于窗口大小的)
-    float mPicIndex_Y; //
+    GLuint                  m_textureUniformY;      // Y 纹理位置
+    GLuint                  m_textureUniformU;      // U 纹理位置
+    GLuint                  m_textureUniformV;      // V 纹理位置
 
-    bool mIsOpenGLInited; //openGL初始化函数是否执行过了
-
-    ///OpenGL用于绘制矩形
-    GLuint m_posAttr;
-    GLuint m_colAttr;
+    int                     m_videoWidth;           // 视频宽度
+    int                     m_videoHeight;          // 视频高度
 
     std::shared_ptr<MCWidget::MCVideoFrame> m_pVideoFrame;
 };
