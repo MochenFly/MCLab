@@ -54,6 +54,8 @@ MCVideoWidget::MCVideoWidget(QWidget* parent, Qt::WindowFlags f)
     m_pTextureU = nullptr;
     m_pTextureV = nullptr;
 
+    m_pVertexVertices = new GLfloat[8];
+
     m_textureIdY = 0;
     m_textureIdU = 0;
     m_textureIdV = 0;
@@ -70,6 +72,7 @@ MCVideoWidget::MCVideoWidget(QWidget* parent, Qt::WindowFlags f)
 
 MCVideoWidget::~MCVideoWidget()
 {
+    delete[] m_pVertexVertices;
 }
 
 void MCVideoWidget::updateFrame(std::shared_ptr<MCWidget::MCVideoFrame> frame)
@@ -154,11 +157,13 @@ void MCVideoWidget::initializeGL()
     m_textureUniformU = m_pShaderProgram->uniformLocation("tex_u");
     m_textureUniformV = m_pShaderProgram->uniformLocation("tex_v");
 
+    memcpy(m_pVertexVertices, s_vertexVertices, sizeof(s_vertexVertices));
+
     // 设置读取的 YUV 数据为 1 字节对齐，
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
     // 设置属性 ATTRIB_VERTEX 的顶点矩阵值以及格式
-    glVertexAttribPointer(ATTRIB_VERTEX, 2, GL_FLOAT, 0, 0, s_vertexVertices);
+    glVertexAttribPointer(ATTRIB_VERTEX, 2, GL_FLOAT, 0, 0, m_pVertexVertices);
     // 设置属性 ATTRIB_TEXTURE 的纹理矩阵值以及格式
     glVertexAttribPointer(ATTRIB_TEXTURE, 2, GL_FLOAT, 0, 0, s_textureVertices);
     // 启用 ATTRIB_VERTEX 属性的数据,默认是关闭的
@@ -193,8 +198,10 @@ void MCVideoWidget::updateGLVertex(int windowWidth, int widowHeight)
 {
     if (m_videoWidth <= 0 || m_videoHeight <= 0)
     {
+        memcpy(m_pVertexVertices, s_vertexVertices, sizeof(s_vertexVertices));
+
         // 设置属性 ATTRIB_VERTEX 的顶点矩阵值以及格式
-        glVertexAttribPointer(ATTRIB_VERTEX, 2, GL_FLOAT, 0, 0, s_vertexVertices);
+        glVertexAttribPointer(ATTRIB_VERTEX, 2, GL_FLOAT, 0, 0, m_pVertexVertices);
         // 设置属性 ATTRIB_TEXTURE 的纹理矩阵值以及格式
         glVertexAttribPointer(ATTRIB_TEXTURE, 2, GL_FLOAT, 0, 0, s_textureVertices);
         // 启用 ATTRIB_VERTEX 属性的数据,默认是关闭的
@@ -238,6 +245,8 @@ void MCVideoWidget::updateGLVertex(int windowWidth, int widowHeight)
             index_x_2, index_y_1,
             index_x_1, index_y_1,
         };
+
+        memcpy(m_pVertexVertices, vertexVertices, sizeof(vertexVertices));
 
         // 设置属性 ATTRIB_VERTEX
         glVertexAttribPointer(ATTRIB_VERTEX, 2, GL_FLOAT, 0, 0, vertexVertices);

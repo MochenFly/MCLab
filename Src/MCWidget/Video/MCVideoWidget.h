@@ -37,10 +37,11 @@ private:
     QOpenGLTexture*         m_pTextureU;            // U 纹理对象
     QOpenGLTexture*         m_pTextureV;            // V 纹理对象
 
+    GLfloat*                m_pVertexVertices;      // 顶点矩阵
+
     GLuint                  m_textureIdY;           // Y 纹理对象 id
     GLuint                  m_textureIdU;           // U 纹理对象 id
     GLuint                  m_textureIdV;           // V 纹理对象 id
-
     GLuint                  m_textureUniformY;      // Y 纹理位置
     GLuint                  m_textureUniformU;      // U 纹理位置
     GLuint                  m_textureUniformV;      // V 纹理位置
