@@ -3,7 +3,6 @@ USE_MCWIDGET_NAMESPACE
 
 #include <QDebug>
 #include <QByteArray>
-#include <QApplication>
 
 #include <thread>
 

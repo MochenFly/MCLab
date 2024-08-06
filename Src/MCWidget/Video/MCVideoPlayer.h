@@ -5,7 +5,6 @@
 
 #include <QObject>
 #include <QMutex>
-#include <QTimer>
 
 extern "C"
 {
