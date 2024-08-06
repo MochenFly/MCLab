@@ -23,9 +23,9 @@ private:
     void freeData();
 
 private:
-    uint8_t*        m_YUVData{ nullptr };
-    int m_width{ 0 };
-    int m_height{ 0 };
+    uint8_t*        m_YUVData       { nullptr };
+    int             m_width         { 0 };
+    int             m_height        { 0 };
 };
 
 MCWIDGET_END_NAMESPACE
