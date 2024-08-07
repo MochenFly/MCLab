@@ -568,13 +568,14 @@ void MCVideoPlayer::decodeVideo()
             // 将解码后的数据转换成 AV_PIX_FMT_YUV420P
             pSwsContext = sws_getContext(videoWidth, videoHeight, (AVPixelFormat)pFrame->format,
                                          videoWidth, videoHeight, AV_PIX_FMT_YUV420P,
-                                         SWS_BICUBIC, NULL, NULL, NULL);
+                                         SWS_BICUBIC, nullptr, nullptr, nullptr);
         }
 
         sws_scale(pSwsContext, pFrame->data, pFrame->linesize, 0, videoHeight, pFrameYUV->data, pFrameYUV->linesize);
 
         std::shared_ptr<MCVideoFrame> pVideoFrame = std::make_shared<MCVideoFrame>();
-        pVideoFrame.get()->setYUVData(pYUVBuffer, videoWidth, videoHeight);
+        pVideoFrame.get()->setYUVData(pYUVBuffer, videoWidth, videoHeight, 
+                                      pFrameYUV->data[0], pFrameYUV->data[1], pFrameYUV->data[2]);
 
         // 跳转触发时，在渲染信号前，继续解码下一帧
         if (m_seekFrameFlag)
