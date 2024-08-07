@@ -1,10 +1,12 @@
 #pragma once
 
 #include <QtWidgets/QMainWindow>
+#include <QTimer>
 
 #include "MCWidget/MCVideoPlayer.h"
 #include "MCWidget/MCVideoWidget.h"
 #include "MCWidget/MCVideoFrame.h"
+#include "MCWidget/Widget.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MCVideoPlayTest; };
@@ -34,5 +36,6 @@ private:
 
     MCWidget::MCVideoPlayer*    m_pVideoPlayer      { nullptr };
     MCWidget::MCVideoWidget*    m_pVideoWidget      { nullptr };
+    MCWidget::Widget*           m_pwidget      { nullptr };
     QTimer*                     m_pTimer            { nullptr };
 };
