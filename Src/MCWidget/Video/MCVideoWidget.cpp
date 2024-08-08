@@ -4,10 +4,10 @@ USE_MCWIDGET_NAMESPACE
 // 顶点矩阵
 static const GLfloat s_vertexVertices[] =
 {
-    -1.0f, -1.0f,
-     1.0f, -1.0f,
-    -1.0f,  1.0f,
-     1.0f,  1.0f,
+   -1.0f, -1.0f,
+    1.0f, -1.0f,
+   -1.0f,  1.0f,
+    1.0f,  1.0f,
 };
 
 // 纹理矩阵
@@ -25,10 +25,6 @@ MCVideoWidget::MCVideoWidget(QWidget* parent, Qt::WindowFlags f)
     m_pVertexShader = nullptr;
     m_pFragmentShader = nullptr;
     m_pShaderProgram = nullptr;
-
-    m_pTextureY = nullptr;
-    m_pTextureU = nullptr;
-    m_pTextureV = nullptr;
 
     m_pVertexVertices = new GLfloat[8];
 
@@ -48,11 +44,15 @@ MCVideoWidget::MCVideoWidget(QWidget* parent, Qt::WindowFlags f)
 
 MCVideoWidget::~MCVideoWidget()
 {
-    delete m_pTextureY;
-    delete m_pTextureU;
-    delete m_pTextureV;
+    // 确保当前 OpenGL 上下文是有效的
+    makeCurrent();
+
+    delete m_pShaderProgram;
 
     delete[] m_pVertexVertices;
+
+    // 清理完成后释放当前上下文
+    doneCurrent();
 
     m_pVideoFrame = nullptr;
 }
@@ -82,18 +82,19 @@ void MCVideoWidget::updateFrame(std::shared_ptr<MCWidget::MCVideoFrame> frame)
 void MCVideoWidget::initializeGL()
 {
     initializeOpenGLFunctions();
+
     glEnable(GL_DEPTH_TEST);
 
     // 顶点着色器
     m_pVertexShader = new QOpenGLShader(QOpenGLShader::Vertex, this);
     const char* vsrc =
-        "attribute vec4 vertexIn;       \n"
-        "attribute vec2 textureIn;      \n"
-        "varying vec2 textureOut;       \n"
-        "void main(void)                \n"
-        "{                              \n"
-        "gl_Position = vertexIn;        \n"
-        "textureOut = textureIn;        \n"
+        "attribute vec4 vertexIn;           \n"
+        "attribute vec2 textureIn;          \n"
+        "varying vec2 textureOut;           \n"
+        "void main(void)                    \n"
+        "{                                  \n"
+        "   gl_Position = vertexIn;         \n"
+        "   textureOut = textureIn;         \n"
         "}";
     m_pVertexShader->compileSourceCode(vsrc);
 
@@ -109,19 +110,20 @@ void MCVideoWidget::initializeGL()
         "uniform sampler2D tex_v;                               \n"
         "void main(void)                                        \n"
         "{                                                      \n"
-            "vec3 yuv;                                          \n"
-            "vec3 rgb;                                          \n"
-            "yuv.x = texture2D(tex_y, textureOut).r;            \n"
-            "yuv.y = texture2D(tex_u, textureOut).r - 0.5;      \n"
-            "yuv.z = texture2D(tex_v, textureOut).r - 0.5;      \n"
-            "rgb = mat3( 1, 1, 1, 0, -0.39465, 2.03211,         \
-                         1.13983, -0.58060, 0) * yuv;           \n"
-            "gl_FragColor = vec4(rgb, 1);                       \n"
+        "   vec3 yuv;                                           \n"
+        "   vec3 rgb;                                           \n"
+        "   yuv.x = texture2D(tex_y, textureOut).r;             \n"
+        "   yuv.y = texture2D(tex_u, textureOut).r - 0.5;       \n"
+        "   yuv.z = texture2D(tex_v, textureOut).r - 0.5;       \n"
+        "   rgb = mat3( 1,      1,         1,                   \
+                        0,      -0.187324, 1.8556,              \
+                        1.5748, -0.468124, 0 ) * yuv;           \n"
+        "   gl_FragColor = vec4(rgb, 1);                        \n"
         "}";
     m_pFragmentShader->compileSourceCode(fsrc);
 
     // 创建着色器程序容器
-    m_pShaderProgram = new QOpenGLShaderProgram(this);
+    m_pShaderProgram = new QOpenGLShaderProgram();
     // 将顶点着色器添加到程序容器
     m_pShaderProgram->addShader(m_pVertexShader);
     // 将片段着色器添加到程序容器
@@ -130,7 +132,7 @@ void MCVideoWidget::initializeGL()
     m_pShaderProgram->bindAttributeLocation("vertexIn", 3);
     // 绑定纹理属性
     m_pShaderProgram->bindAttributeLocation("textureIn", 4);
-    // 链接所有所有添入到的着色器程序
+    // 链接着色器程序
     m_pShaderProgram->link();
     // 激活所有链接
     m_pShaderProgram->bind();
@@ -140,28 +142,41 @@ void MCVideoWidget::initializeGL()
     m_textureUniformU = m_pShaderProgram->uniformLocation("tex_u");
     m_textureUniformV = m_pShaderProgram->uniformLocation("tex_v");
 
+    // 生成纹理，获取 Y 纹理索引值
+    glGenTextures(1, &m_textureIdY);
+    // 生成纹理，获取 U 纹理索引值
+	glGenTextures(1, &m_textureIdU);
+    // 生成纹理，获取 V 纹理索引值
+	glGenTextures(1, &m_textureIdV);
+
+    // 设置 Y 纹理参数
+    glBindTexture(GL_TEXTURE_2D, m_textureIdY);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    // 设置 U 纹理参数
+    glBindTexture(GL_TEXTURE_2D, m_textureIdU);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    // 设置 V 纹理参数
+    glBindTexture(GL_TEXTURE_2D, m_textureIdV);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
     // 设置读取的 YUV 数据为 1 字节对齐，
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-    updateGLVertex(this->width(), this->height());
-
-    // 分别创建 Y, U, V 纹理对象
-    m_pTextureY = new QOpenGLTexture(QOpenGLTexture::Target2D);
-    m_pTextureU = new QOpenGLTexture(QOpenGLTexture::Target2D);
-    m_pTextureV = new QOpenGLTexture(QOpenGLTexture::Target2D);
-    m_pTextureY->create();
-    m_pTextureU->create();
-    m_pTextureV->create();
-
-    // 获取返回 Y 分量的纹理索引值
-    m_textureIdY = m_pTextureY->textureId();
-    // 获取返回 U 分量的纹理索引值
-    m_textureIdU = m_pTextureU->textureId();
-    // 获取返回 V 分量的纹理索引值
-    m_textureIdV = m_pTextureV->textureId();
-
     // 设置清除颜色
     glClearColor(0.0, 0.0, 0.0, 0.0);
+
+    updateGLVertex(this->width(), this->height());
 }
 
 void MCVideoWidget::updateGLVertex(int windowWidth, int widowHeight)
@@ -247,40 +262,28 @@ void MCVideoWidget::paintGL()
 
     if (nullptr != m_pVideoFrame.get())
     {
-        uint8_t* bufYuv420p = m_pVideoFrame.get()->getYUVData();
+        uint8_t* pYUVData = m_pVideoFrame.get()->getYUVData();
 
-        if (bufYuv420p != NULL)
+        if (nullptr != pYUVData)
         {
             m_pShaderProgram->bind();
 
             // 加载 Y 数据纹理
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, m_textureIdY);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, m_videoWidth, m_videoHeight, 0, GL_RED, GL_UNSIGNED_BYTE, bufYuv420p);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, m_videoWidth, m_videoHeight, 0, GL_RED, GL_UNSIGNED_BYTE, pYUVData);
 
             // 加载 U 数据纹理
             glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_2D, m_textureIdU);
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, m_videoWidth / 2, m_videoHeight / 2, 0, GL_RED, GL_UNSIGNED_BYTE, 
-                         (char*)bufYuv420p + m_videoWidth * m_videoHeight);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+                         (char*)pYUVData + m_videoWidth * m_videoHeight);
             
             // 加载 V 数据纹理
             glActiveTexture(GL_TEXTURE2);
             glBindTexture(GL_TEXTURE_2D, m_textureIdV);
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, m_videoWidth / 2, m_videoHeight / 2, 0, GL_RED, GL_UNSIGNED_BYTE, 
-                         (char*)bufYuv420p + m_videoWidth * m_videoHeight * 5 / 4);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+                         (char*)pYUVData + m_videoWidth * m_videoHeight * 5 / 4);
 
             // 指定 Y 纹理要使用新值
             glUniform1i(m_textureUniformY, 0);
@@ -288,6 +291,7 @@ void MCVideoWidget::paintGL()
             glUniform1i(m_textureUniformU, 1);
             // 指定 V 纹理要使用新值
             glUniform1i(m_textureUniformV, 2);
+
             // 使用顶点数组方式绘制图形
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 

@@ -33,10 +33,6 @@ private:
     QOpenGLShader*          m_pFragmentShader;      // 片段着色器
     QOpenGLShaderProgram*   m_pShaderProgram;       // 着色器程序
 
-    QOpenGLTexture*         m_pTextureY;            // Y 纹理对象
-    QOpenGLTexture*         m_pTextureU;            // U 纹理对象
-    QOpenGLTexture*         m_pTextureV;            // V 纹理对象
-
     GLfloat*                m_pVertexVertices;      // 顶点矩阵
 
     GLuint                  m_textureIdY;           // Y 纹理对象 id
