@@ -574,8 +574,7 @@ void MCVideoPlayer::decodeVideo()
         sws_scale(pSwsContext, pFrame->data, pFrame->linesize, 0, videoHeight, pFrameYUV->data, pFrameYUV->linesize);
 
         std::shared_ptr<MCVideoFrame> pVideoFrame = std::make_shared<MCVideoFrame>();
-        pVideoFrame.get()->setYUVData(pYUVBuffer, videoWidth, videoHeight, 
-                                      pFrameYUV->data[0], pFrameYUV->data[1], pFrameYUV->data[2]);
+        pVideoFrame.get()->setYUVData(pYUVBuffer, videoWidth, videoHeight);
 
         // 跳转触发时，在渲染信号前，继续解码下一帧
         if (m_seekFrameFlag)
