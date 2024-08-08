@@ -8,9 +8,7 @@ MCVideoPlayTest::MCVideoPlayTest(QWidget* parent)
     ui->setupUi(this);
 
     m_pVideoWidget = new MCWidget::MCVideoWidget(ui->wgtVideo);
-    m_pwidget = new MCWidget::Widget(ui->wgtVideo);
     ui->hLayoutVideo->addWidget(m_pVideoWidget);
-    ui->hLayoutVideo->addWidget(m_pwidget);
 
     ui->sliderTime->setValueByCliucked(true);
 
@@ -93,7 +91,6 @@ void MCVideoPlayTest::videoDurationChanged(int msecond)
 void MCVideoPlayTest::videoFrameChanged(std::shared_ptr<MCWidget::MCVideoFrame> frame)
 {
     m_pVideoWidget->updateFrame(frame);
-    m_pwidget->updateFrame(frame);
 }
 
 void MCVideoPlayTest::videoStateChanged(MCWidget::MCVideoPlayer::VideoState state)

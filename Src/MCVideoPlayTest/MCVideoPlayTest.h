@@ -6,7 +6,6 @@
 #include "MCWidget/MCVideoPlayer.h"
 #include "MCWidget/MCVideoWidget.h"
 #include "MCWidget/MCVideoFrame.h"
-#include "MCWidget/Widget.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MCVideoPlayTest; };
@@ -32,10 +31,8 @@ private:
     QString getTimeString(int msecond);
 
 private:
-    Ui::MCVideoPlayTest*        ui;
-
+    Ui::MCVideoPlayTest*        ui                  { nullptr };
     MCWidget::MCVideoPlayer*    m_pVideoPlayer      { nullptr };
     MCWidget::MCVideoWidget*    m_pVideoWidget      { nullptr };
-    MCWidget::Widget*           m_pwidget      { nullptr };
     QTimer*                     m_pTimer            { nullptr };
 };
