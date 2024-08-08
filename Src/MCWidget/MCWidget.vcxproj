@@ -26,10 +26,6 @@
   <ItemGroup>
     <QtRcc Include="Resource.qrc" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="Video\Shaders\fragment_shader.glsl" />
-    <None Include="Video\Shaders\vertex_shader.glsl" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{B3B3F3F5-BE56-49C2-9E0C-AD86D3F86BBA}</ProjectGuid>
     <Keyword>QtVS_v304</Keyword>
