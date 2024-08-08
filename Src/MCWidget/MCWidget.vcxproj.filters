@@ -14,9 +14,6 @@
     <Filter Include="Resource">
       <UniqueIdentifier>{7691d853-5e11-42e7-b857-eb003e795d80}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Video\Shaders">
-      <UniqueIdentifier>{d122f25c-4108-4302-8ec9-b77e071c371f}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="InputWidgets\MCSlider.cpp">
@@ -29,9 +26,6 @@
       <Filter>Video</Filter>
     </ClCompile>
     <ClCompile Include="Video\MCVideoFrame.cpp">
-      <Filter>Video</Filter>
-    </ClCompile>
-    <ClCompile Include="Video\Widget.cpp">
       <Filter>Video</Filter>
     </ClCompile>
   </ItemGroup>
@@ -48,9 +42,6 @@
     <QtMoc Include="Video\MCVideoFrame.h">
       <Filter>Video</Filter>
     </QtMoc>
-    <QtMoc Include="Video\Widget.h">
-      <Filter>Video</Filter>
-    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Global\MCWidget_Global.h">
@@ -61,13 +52,5 @@
     <QtRcc Include="Resource.qrc">
       <Filter>Resource</Filter>
     </QtRcc>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Video\Shaders\fragment_shader.glsl">
-      <Filter>Video\Shaders</Filter>
-    </None>
-    <None Include="Video\Shaders\vertex_shader.glsl">
-      <Filter>Video\Shaders</Filter>
-    </None>
   </ItemGroup>
 </Project>

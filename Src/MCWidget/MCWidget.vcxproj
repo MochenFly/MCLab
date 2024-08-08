@@ -12,7 +12,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Global\MCWidget_Global.h" />
-    <QtMoc Include="Video\Widget.h" />
     <QtMoc Include="Video\MCVideoFrame.h" />
     <QtMoc Include="Video\MCVideoWidget.h" />
     <QtMoc Include="Video\MCVideoPlayer.h" />
@@ -23,14 +22,9 @@
     <ClCompile Include="Video\MCVideoFrame.cpp" />
     <ClCompile Include="Video\MCVideoPlayer.cpp" />
     <ClCompile Include="Video\MCVideoWidget.cpp" />
-    <ClCompile Include="Video\Widget.cpp" />
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="Resource.qrc" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Video\Shaders\fragment_shader.glsl" />
-    <None Include="Video\Shaders\vertex_shader.glsl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{B3B3F3F5-BE56-49C2-9E0C-AD86D3F86BBA}</ProjectGuid>

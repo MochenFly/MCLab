@@ -8,14 +8,12 @@ MCVideoPlayTest::MCVideoPlayTest(QWidget* parent)
     ui->setupUi(this);
 
     m_pVideoWidget = new MCWidget::MCVideoWidget(ui->wgtVideo);
-    m_pwidget = new MCWidget::Widget(ui->wgtVideo);
     ui->hLayoutVideo->addWidget(m_pVideoWidget);
-    ui->hLayoutVideo->addWidget(m_pwidget);
 
     ui->sliderTime->setValueByCliucked(true);
 
     m_pVideoPlayer = new MCWidget::MCVideoPlayer(this);
-    m_pVideoPlayer->setVideoFilePath(QString::fromLocal8Bit("D:/Resource/Video/test.mp4"));
+    m_pVideoPlayer->setVideoFilePath(QString::fromLocal8Bit(""));
 
     m_pTimer = new QTimer(this);
     connect(m_pTimer, &QTimer::timeout, this, &MCVideoPlayTest::timerTimeOut);
@@ -93,7 +91,6 @@ void MCVideoPlayTest::videoDurationChanged(int msecond)
 void MCVideoPlayTest::videoFrameChanged(std::shared_ptr<MCWidget::MCVideoFrame> frame)
 {
     m_pVideoWidget->updateFrame(frame);
-    m_pwidget->updateFrame(frame);
 }
 
 void MCVideoPlayTest::videoStateChanged(MCWidget::MCVideoPlayer::VideoState state)
