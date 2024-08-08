@@ -31,9 +31,6 @@
     <ClCompile Include="Video\MCVideoFrame.cpp">
       <Filter>Video</Filter>
     </ClCompile>
-    <ClCompile Include="Video\Widget.cpp">
-      <Filter>Video</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="InputWidgets\MCSlider.h">
@@ -46,9 +43,6 @@
       <Filter>Video</Filter>
     </QtMoc>
     <QtMoc Include="Video\MCVideoFrame.h">
-      <Filter>Video</Filter>
-    </QtMoc>
-    <QtMoc Include="Video\Widget.h">
       <Filter>Video</Filter>
     </QtMoc>
   </ItemGroup>

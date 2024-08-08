@@ -12,7 +12,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Global\MCWidget_Global.h" />
-    <QtMoc Include="Video\Widget.h" />
     <QtMoc Include="Video\MCVideoFrame.h" />
     <QtMoc Include="Video\MCVideoWidget.h" />
     <QtMoc Include="Video\MCVideoPlayer.h" />
@@ -23,7 +22,6 @@
     <ClCompile Include="Video\MCVideoFrame.cpp" />
     <ClCompile Include="Video\MCVideoPlayer.cpp" />
     <ClCompile Include="Video\MCVideoWidget.cpp" />
-    <ClCompile Include="Video\Widget.cpp" />
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="Resource.qrc" />
