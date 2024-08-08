@@ -9,3 +9,9 @@ MCLab，个人开发练手项目及功能模块合集。
 - Module：第三方库引用目录
 - Src：源码目录
 - Temp：临时文件目录
+
+# 配置
+
+- Qt 5.12.12
+- Visual Studio 2017
+- 配置：Release，平台：x64
