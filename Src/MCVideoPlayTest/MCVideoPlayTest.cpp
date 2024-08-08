@@ -13,7 +13,7 @@ MCVideoPlayTest::MCVideoPlayTest(QWidget* parent)
     ui->sliderTime->setValueByCliucked(true);
 
     m_pVideoPlayer = new MCWidget::MCVideoPlayer(this);
-    m_pVideoPlayer->setVideoFilePath(QString::fromLocal8Bit("D:/Resource/Video/test.mp4"));
+    m_pVideoPlayer->setVideoFilePath(QString::fromLocal8Bit(""));
 
     m_pTimer = new QTimer(this);
     connect(m_pTimer, &QTimer::timeout, this, &MCVideoPlayTest::timerTimeOut);
