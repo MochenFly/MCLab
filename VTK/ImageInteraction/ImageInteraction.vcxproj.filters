@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Mainwindow">
+      <UniqueIdentifier>{541fdbb2-d0e1-440f-af8a-4cf9bedbf168}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="VTK">
+      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
+      <Extensions>ui</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Mainwindow</Filter>
+    </ClCompile>
+    <ClCompile Include="Mainwindow.cpp">
+      <Filter>Mainwindow</Filter>
+    </ClCompile>
+    <ClCompile Include="ImageInteractorStyle.cpp">
+      <Filter>VTK</Filter>
+    </ClCompile>
+    <ClCompile Include="RectangleImageInteractorStyle.cpp">
+      <Filter>VTK</Filter>
+    </ClCompile>
+    <ClCompile Include="Render2DWidget.cpp">
+      <Filter>VTK</Filter>
+    </ClCompile>
+    <ClCompile Include="EllipseImageInteractorStyle.cpp">
+      <Filter>VTK</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <QtUic Include="Mainwindow.ui">
+      <Filter>Mainwindow</Filter>
+    </QtUic>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="Mainwindow.h">
+      <Filter>Mainwindow</Filter>
+    </QtMoc>
+    <QtMoc Include="Render2DWidget.h">
+      <Filter>VTK</Filter>
+    </QtMoc>
+  </ItemGroup>
+  <ItemGroup>
+    <QtRcc Include="Mainwindow.qrc">
+      <Filter>Mainwindow</Filter>
+    </QtRcc>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ImageInteractorStyle.h">
+      <Filter>VTK</Filter>
+    </ClInclude>
+    <ClInclude Include="RectangleImageInteractorStyle.h">
+      <Filter>VTK</Filter>
+    </ClInclude>
+    <ClInclude Include="EllipseImageInteractorStyle.h">
+      <Filter>VTK</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
