@@ -10,8 +10,8 @@ public:
     static ImageInteractorStyle* New();
     vtkTypeMacro(ImageInteractorStyle, vtkInteractorStyleTrackballCamera);
 
-    void OnMouseMove() override;
     void OnLeftButtonDown() override;
+    void OnMouseMove() override;
     void OnLeftButtonUp() override;
     void OnMiddleButtonDown() override;
     void OnMiddleButtonUp() override;
