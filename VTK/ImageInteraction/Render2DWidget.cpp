@@ -65,10 +65,12 @@ void Render2DWidget::initialise()
     m_pRenderer = vtkSmartPointer<vtkRenderer>::New();
     m_pRenderer->SetBackground(1, 1, 1);
     m_pRenderer->SetActiveCamera(m_pCamera);
+    m_pRenderer->ResetCamera();
 
     m_pSecondRenderer = vtkSmartPointer<vtkRenderer>::New();
     m_pSecondRenderer->SetBackground(1, 1, 1);
     m_pSecondRenderer->SetActiveCamera(m_pCamera);
+    m_pSecondRenderer->ResetCamera();
 
     m_pRenderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
     m_pRenderWindow->AddRenderer(m_pRenderer);
