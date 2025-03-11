@@ -28,6 +28,9 @@
     <ClCompile Include="EllipseImageInteractorStyle.cpp">
       <Filter>VTK</Filter>
     </ClCompile>
+    <ClCompile Include="ParametricSplineInteractorStyle.cpp">
+      <Filter>VTK</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="Mainwindow.ui">
@@ -55,6 +58,9 @@
       <Filter>VTK</Filter>
     </ClInclude>
     <ClInclude Include="EllipseImageInteractorStyle.h">
+      <Filter>VTK</Filter>
+    </ClInclude>
+    <ClInclude Include="ParametricSplineInteractorStyle.h">
       <Filter>VTK</Filter>
     </ClInclude>
   </ItemGroup>
