@@ -83,12 +83,30 @@ void Render2DWidget::setInteractorStyle(const InteractorStyleType& type)
 
 void Render2DWidget::drawSplineLine()
 {
+    double displayPoint_1[3] = {50, 10, 0};
+    double displayPoint_2[3] = {60, 0, 0};
+    double displayPoint_3[3] = {70, 10, 0};
+    double displayPoint_4[3] = {80, 0, 0};
+    double displayPoint_5[3] = {90, 10, 0};
+
+    double worldPoint_1[3];
+    double worldPoint_2[3];
+    double worldPoint_3[3];
+    double worldPoint_4[3];
+    double worldPoint_5[3];
+
+    vtkInteractorObserver::ComputeDisplayToWorld(m_pRenderer, displayPoint_1[0], displayPoint_1[1], 0, worldPoint_1);
+    vtkInteractorObserver::ComputeDisplayToWorld(m_pRenderer, displayPoint_2[0], displayPoint_2[1], 0, worldPoint_2);
+    vtkInteractorObserver::ComputeDisplayToWorld(m_pRenderer, displayPoint_3[0], displayPoint_3[1], 0, worldPoint_3);
+    vtkInteractorObserver::ComputeDisplayToWorld(m_pRenderer, displayPoint_4[0], displayPoint_4[1], 0, worldPoint_4);
+    vtkInteractorObserver::ComputeDisplayToWorld(m_pRenderer, displayPoint_5[0], displayPoint_5[1], 0, worldPoint_5);
+
     vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
-    points->InsertNextPoint(0, 0, 0);
-    points->InsertNextPoint(100, 100, 0);
-    points->InsertNextPoint(200, 0, 0);
-    points->InsertNextPoint(300, 100, 0);
-    points->InsertNextPoint(400, 0, 0);
+    points->InsertNextPoint(worldPoint_1[0], worldPoint_1[1], 0);
+    points->InsertNextPoint(worldPoint_2[0], worldPoint_2[1], 0);
+    points->InsertNextPoint(worldPoint_3[0], worldPoint_3[1], 0);
+    points->InsertNextPoint(worldPoint_4[0], worldPoint_4[1], 0);
+    points->InsertNextPoint(worldPoint_5[0], worldPoint_5[1], 0);
 
     vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New();
 
@@ -124,11 +142,15 @@ void Render2DWidget::drawSplineLine()
     m_pRenderWindow->Render();
 
     vtkPoints* splinePoints = splineData->GetPoints();
-    for (vtkIdType i = 0; i < splinePoints->GetNumberOfPoints(); ++i)
+    int number = splinePoints->GetNumberOfPoints();
+    for (vtkIdType i = 0; i < number; ++i)
     {
         double p[3];
         splinePoints->GetPoint(i, p);
-        qDebug() << "Point ID: " << i << "  X: " << p[0] << "  Y: " << p[1] << "  Z: " << p[2];
+        qDebug() << "Point ID: " << i 
+            << "  X: " << QString::number(p[0], 'f', 20) 
+            << "  Y: " << QString::number(p[1], 'f', 20) 
+            << "  Z: " << QString::number(p[2], 'f', 20);
     }
 }
 
