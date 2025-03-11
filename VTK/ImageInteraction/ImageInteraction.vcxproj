@@ -94,6 +94,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="EllipseImageInteractorStyle.cpp" />
+    <ClCompile Include="ParametricSplineInteractorStyle.cpp" />
     <ClCompile Include="RectangleImageInteractorStyle.cpp" />
     <ClCompile Include="Render2DWidget.cpp" />
     <QtRcc Include="Mainwindow.qrc" />
@@ -106,6 +107,7 @@
   <ItemGroup>
     <ClInclude Include="EllipseImageInteractorStyle.h" />
     <ClInclude Include="ImageInteractorStyle.h" />
+    <ClInclude Include="ParametricSplineInteractorStyle.h" />
     <ClInclude Include="RectangleImageInteractorStyle.h" />
     <QtMoc Include="Render2DWidget.h" />
   </ItemGroup>

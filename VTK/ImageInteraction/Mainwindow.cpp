@@ -6,8 +6,6 @@ Mainwindow::Mainwindow(QWidget* parent)
     , ui(new Ui::MainwindowClass())
 {
     initialize();
-
-    m_pRender2DWidget->loadPNGFile("../Data/WuKong.png");
 }
 
 Mainwindow::~Mainwindow()
@@ -49,5 +47,25 @@ void Mainwindow::initializeConnections()
     connect(ui->btnEllipse, &QPushButton::clicked, this, [&]()
     {
         m_pRender2DWidget->setInteractorStyle(Selection_2D_Ellipse);
+    });
+
+    connect(ui->btnSpline, &QPushButton::clicked, this, [&]()
+    {
+        m_pRender2DWidget->setInteractorStyle(InteractorStyle_ParametricSpline);
+    });
+
+    connect(ui->btnImageData, &QPushButton::clicked, this, [&]()
+    {
+        m_pRender2DWidget->loadPNGFile();
+    });
+
+    connect(ui->btnSplineData, &QPushButton::clicked, this, [&]()
+    {
+        m_pRender2DWidget->drawSplineLine();
+    });
+
+    connect(ui->btnClear, &QPushButton::clicked, this, [&]()
+    {
+        m_pRender2DWidget->clearData();
     });
 }
